@@ -1,5 +1,6 @@
 package hiber.config;
 
+import hiber.model.Car;
 import hiber.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,31 +24,29 @@ import java.util.Properties;
 public class AppConfig {
 
    @Autowired
-   private Environment environment;
+   private Environment env;
 
    @Bean
-   public DataSource dataSource() {
+   public DataSource getDataSource() {
       DriverManagerDataSource dataSource = new DriverManagerDataSource();
-      dataSource.setDriverClassName(environment.getProperty("db.driver"));
-      dataSource.setUrl(environment.getProperty("db.url"));
-      dataSource.setUsername(environment.getProperty("db.username"));
-      dataSource.setPassword(environment.getProperty("db.password"));
+      dataSource.setDriverClassName(env.getProperty("db.driver"));
+      dataSource.setUrl(env.getProperty("db.url"));
+      dataSource.setUsername(env.getProperty("db.username"));
+      dataSource.setPassword(env.getProperty("db.password"));
       return dataSource;
    }
 
-   private Properties hibernateProperties() {
-      Properties properties = new Properties();
-      properties.put("hibernate.dialect", environment.getProperty("hibernate.dialect"));
-      properties.put("hibernate.show_sql", environment.getProperty("hibernate.show_sql"));
-      properties.put("hibernate.hbm2ddl.auto", environment.getProperty("hibernate.hbm2ddl.auto"));
-      return properties;
-   }
    @Bean
    public LocalSessionFactoryBean getSessionFactory() {
       LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-      factoryBean.setDataSource(dataSource());
-      factoryBean.setHibernateProperties(hibernateProperties());
-      factoryBean.setPackagesToScan("hiber.model");
+      factoryBean.setDataSource(getDataSource());
+      
+      Properties props=new Properties();
+      props.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+      props.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+
+      factoryBean.setHibernateProperties(props);
+      factoryBean.setAnnotatedClasses(User.class, Car.class);
       return factoryBean;
    }
 
