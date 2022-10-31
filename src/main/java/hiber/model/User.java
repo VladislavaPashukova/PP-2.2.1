@@ -38,8 +38,6 @@ public class User {
       this.car = car;
    }
 
-
-
    public Long getId() {
       return id;
    }
